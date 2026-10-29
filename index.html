@@ -1,11 +1,66 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="it">
 <head>
-  <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>GianlucaAce.github.io</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Main page</title>
+  <script src="https://cdn.tailwindcss.com"></script>
 </head>
-<body>
-  <h1>GianlucaAce.github.io Hello!!!</h1>
+<body class="bg-gray-50 text-gray-800">
+
+  <!-- Main content -->
+  <header class="max-w-5xl mx-auto px-6 py-12 text-center">
+    <h1 class="text-4xl font-bold mb-4 text-gray-900">Main title</h1>
+    <p class="text-lg text-gray-800">
+      Content.
+    </p>
+  </header>
+
+  <!-- 3 boxes -->
+  <main class="max-w-5xl mx-auto px-6 pb-16">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+
+      <!-- Box 1 -->
+      <div class="bg-gray-50 rounded-xl shadow-md p-6 border border-gray-100">
+        <div id="box1" class="prose prose-sm">
+          <!-- Contenuto caricato da box1.html -->
+          <p class="text-gray-200">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Box 2 -->
+      <div class="bg-indigo-50 rounded-xl shadow-md p-6 border border-gray-100">
+        <div id="box2" class="prose prose-sm">
+          <p class="text-gray-400">Loading...</p>
+        </div>
+      </div>
+
+      <!-- Box 3 -->
+      <div class="bg-blue-950 rounded-xl shadow-md p-6 border border-gray-100">
+        <div id="box3" class="prose prose-sm">
+          <p class="text-gray-400">Loading...</p>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // Load
+    async function loadBox(id, file) {
+      try {
+        const response = await fetch(file);
+        const html = await response.text();
+        document.getElementById(id).innerHTML = html;
+      } catch (error) {
+        document.getElementById(id).innerHTML = "<p class='text-red-500'>Loading error</p>";
+      }
+    }
+
+    loadBox("box1", "box1.html");
+    loadBox("box2", "box2.html");
+    loadBox("box3", "box3.html");
+  </script>
+
 </body>
 </html>
