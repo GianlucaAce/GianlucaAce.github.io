@@ -3,77 +3,418 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Main page</title>
-  <script src="https://cdn.tailwindcss.com"></script>
+  <title>Cyberpunk Neon Room - Interactive Links</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { overflow: hidden; background: #000; font-family: system-ui, sans-serif; }
+    canvas { display: block; }
+    .label {
+      color: #fff;
+      font-size: 15px;
+      font-weight: 600;
+      padding: 6px 12px;
+      background: rgba(0, 0, 0, 0.75);
+      border-radius: 6px;
+      border: 1px solid;
+      text-shadow: 0 0 10px currentColor;
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: 0.5px;
+    }
+    .main-title {
+      color: #fff;
+      font-size: 65px;
+      font-weight: 600;
+      padding: 8px 20px;
+      background: rgba(0, 0, 0, 0.55);
+      border-radius: 12px;
+      border: 2px solid #00f0ff;
+      text-shadow:
+        0 0 12px #00f0ff,
+        0 0 28px #ff00aa,
+        0 0 48px #00f0ff;
+      white-space: nowrap;
+      pointer-events: none;
+      user-select: none;
+      letter-spacing: 1px;
+    }
+  </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body>
+  <script type="importmap">
+  {
+    "imports": {
+      "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+      "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+    }
+  }
+  </script>
 
-  <!-- Main content -->
-  <header class="max-w-5xl mx-auto px-6 py-12 text-center">
-    <h1 class="text-4xl font-bold mb-4 text-gray-900">Ideas is all you need</h1>
-    <p class="text-lg text-gray-800">
-      
-    </p>
-  </header>
+  <script type="module">
+    import * as THREE from 'three';
+    import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+    import { CSS2DRenderer, CSS2DObject } from 'three/addons/renderers/CSS2DRenderer.js';
 
-  <!-- 3 boxes -->
-  <main class="max-w-5xl mx-auto px-6 pb-16">
-    <div class="grid grid-cols-1 gap-6">
+    // ——— Scene, Camera, Renderer ———
+    const scene = new THREE.Scene();
+    scene.background = new THREE.Color(0x050510);
+    scene.fog = new THREE.FogExp2(0x050510, 0.035);
 
-      <!-- Box 4 -->
-      <div class="bg-blue-950 rounded-xl shadow-md p-6 border border-gray-100">
-        <h2 class="text-xl font-semibold mb-4 text-white">GitHub Repo - today picks</h2>
-        <div id="box4" class="prose prose-sm">
-          <p class="text-gray-400">Loading...</p>
-        </div>
-      </div>
+    const camera = new THREE.PerspectiveCamera(60, window.innerWidth / window.innerHeight, 0.1, 100);
+    camera.position.set(7, 5, 11);
 
-      <!-- Box 3 -->
-      <div class="bg-blue-50 rounded-xl shadow-md p-6 border border-gray-100">
-        <h2 class="text-xl font-semibold mb-4 text-gray-900">Ai weekly update</h2>
-        <div id="box3" class="prose prose-sm">
-          <p class="text-gray-200">Loading...</p>
-        </div>
-      </div>
+    const renderer = new THREE.WebGLRenderer({ antialias: true });
+    renderer.setSize(window.innerWidth, window.innerHeight);
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    renderer.shadowMap.enabled = true;
+    renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+    renderer.toneMapping = THREE.ACESFilmicToneMapping;
+    renderer.toneMappingExposure = 1.15;
+    document.body.appendChild(renderer.domElement);
 
-      <!-- Box 1 -->
-      <div class="bg-gray-50 rounded-xl shadow-md p-6 border border-gray-100">
-        <h2 class="text-xl font-semibold mb-4 text-gray-900">Dungeons &amp; Dragons (monthly update)</h2>
-        <div id="box1" class="prose prose-sm">
-          <!-- Contenuto caricato da box1.html -->
-          <p class="text-gray-200">Loading...</p>
-        </div>
-      </div>
+    // CSS2D for labels
+    const labelRenderer = new CSS2DRenderer();
+    labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    labelRenderer.domElement.style.position = 'absolute';
+    labelRenderer.domElement.style.top = '0';
+    labelRenderer.domElement.style.pointerEvents = 'none';
+    document.body.appendChild(labelRenderer.domElement);
 
-      <!-- Box 2 -->
-      <div class="bg-indigo-50 rounded-xl shadow-md p-6 border border-gray-100">
-        <h2 class="text-xl font-semibold mb-4 text-indigo-900">Call of Cthulhu (sometimes update)</h2>
-        <div id="box2" class="prose prose-sm">
-          <p class="text-gray-400">Loading...</p>
-        </div>
-      </div>
+    // ——— Controls ———
+    const controls = new OrbitControls(camera, renderer.domElement);
+    controls.enableDamping = true;
+    controls.dampingFactor = 0.08;
+    controls.minDistance = 3;
+    controls.maxDistance = 28;
+    controls.maxPolarAngle = Math.PI * 0.92;
+    controls.target.set(0, 2.8, 0);
 
+    // ——— Lights ———
+    scene.add(new THREE.AmbientLight(0x1a1a2e, 0.35));
+    scene.add(new THREE.HemisphereLight(0x2244aa, 0x110022, 0.4));
 
+    const lightData = [
+      { color: 0x00f0ff, pos: [-6, 5, -6], intensity: 16, dist: 24 },
+      { color: 0xff00aa, pos: [ 6, 5, -6], intensity: 14, dist: 24 },
+      { color: 0x00f0ff, pos: [-6, 5,  6], intensity: 13, dist: 22 },
+      { color: 0xff00aa, pos: [ 6, 4,  6], intensity: 13, dist: 22 },
+      { color: 0xaa00ff, pos: [ 0, 7.5, 0], intensity: 11, dist: 20 }
+    ];
+    lightData.forEach(l => {
+      const pl = new THREE.PointLight(l.color, l.intensity, l.dist, 2);
+      pl.position.set(...l.pos);
+      pl.castShadow = true;
+      pl.shadow.mapSize.set(1024, 1024);
+      pl.shadow.bias = -0.001;
+      scene.add(pl);
+    });
 
-    </div>
-  </main>
+    // ——— Floor ———
+    const floor = new THREE.Mesh(
+      new THREE.PlaneGeometry(24, 24),
+      new THREE.MeshStandardMaterial({
+        color: 0x0a0a12,
+        metalness: 0.92,
+        roughness: 0.12
+      })
+    );
+    floor.rotation.x = -Math.PI / 2;
+    floor.receiveShadow = true;
+    scene.add(floor);
 
-  <script>
-    // Load
-    async function loadBox(id, file) {
-      try {
-        const response = await fetch(file);
-        const html = await response.text();
-        document.getElementById(id).innerHTML = html;
-      } catch (error) {
-        document.getElementById(id).innerHTML = "<p class='text-red-500'>Loading error</p>";
+    const grid = new THREE.GridHelper(24, 48, 0x003344, 0x001122);
+    grid.position.y = 0.01;
+    grid.material.opacity = 0.35;
+    grid.material.transparent = true;
+    scene.add(grid);
+
+    // ——— Interactive orbiting objects ———
+    const interactive = [];
+    const orbitRadius = 4.8;
+    const orbitHeight = 3.1;
+    const orbitSpeed = 0.28;
+
+    // 1. AI News – neural core
+    function createAI() {
+      const group = new THREE.Group();
+
+      const coreMat = new THREE.MeshPhysicalMaterial({
+        color: 0x00e5ff,
+        emissive: 0x0088aa,
+        emissiveIntensity: 0.9,
+        metalness: 0.3,
+        roughness: 0.15,
+        transmission: 0.35,
+        thickness: 0.6,
+        transparent: true
+      });
+      const core = new THREE.Mesh(new THREE.IcosahedronGeometry(0.7, 1), coreMat);
+      core.castShadow = true;
+      group.add(core);
+
+      const nodeMat = new THREE.MeshStandardMaterial({
+        color: 0xff00cc,
+        emissive: 0xff00aa,
+        emissiveIntensity: 1.4,
+        metalness: 0.6,
+        roughness: 0.25
+      });
+      const nodes = [];
+      for (let i = 0; i < 6; i++) {
+        const node = new THREE.Mesh(new THREE.SphereGeometry(0.16, 12, 12), nodeMat);
+        const a = (i / 6) * Math.PI * 2;
+        node.position.set(Math.cos(a) * 1.15, Math.sin(a * 1.5) * 0.4, Math.sin(a) * 1.15);
+        group.add(node);
+        nodes.push(node);
+      }
+
+      const light = new THREE.PointLight(0x00e5ff, 4, 8, 2);
+      group.add(light);
+
+      group.userData = {
+        title: 'Ai news',
+        url: 'box3.html',
+        type: 'ai',
+        nodes
+      };
+      return group;
+    }
+
+    // 2. D&D News – d20
+    function createDND() {
+      const group = new THREE.Group();
+
+      const dieMat = new THREE.MeshStandardMaterial({
+        color: 0xc41e3a,
+        emissive: 0x5a0010,
+        emissiveIntensity: 0.45,
+        metalness: 0.55,
+        roughness: 0.3
+      });
+      const die = new THREE.Mesh(new THREE.IcosahedronGeometry(0.95, 0), dieMat);
+      die.castShadow = true;
+      group.add(die);
+
+      const edgeMat = new THREE.MeshBasicMaterial({
+        color: 0xffd700,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.55
+      });
+      const edges = new THREE.Mesh(new THREE.IcosahedronGeometry(0.97, 0), edgeMat);
+      group.add(edges);
+
+      const light = new THREE.PointLight(0xff4466, 3.5, 7, 2);
+      group.add(light);
+
+      group.userData = {
+        title: 'D&D News',
+        url: 'box1.html',
+        type: 'dnd'
+      };
+      return group;
+    }
+
+    // 3. GitHub picks – repo cube
+    function createGitHub() {
+      const group = new THREE.Group();
+
+      const boxMat = new THREE.MeshStandardMaterial({
+        color: 0x1b1f23,
+        emissive: 0x0d1117,
+        emissiveIntensity: 0.3,
+        metalness: 0.7,
+        roughness: 0.35
+      });
+      const box = new THREE.Mesh(new THREE.BoxGeometry(1.3, 1.1, 1.3), boxMat);
+      box.castShadow = true;
+      group.add(box);
+
+      const accentMat = new THREE.MeshStandardMaterial({
+        color: 0x3fb950,
+        emissive: 0x238636,
+        emissiveIntensity: 1.6,
+        metalness: 0.4,
+        roughness: 0.3
+      });
+      const accent = new THREE.Mesh(new THREE.BoxGeometry(1.32, 0.18, 1.32), accentMat);
+      accent.position.y = 0.55;
+      group.add(accent);
+
+      const branch = new THREE.Mesh(
+        new THREE.CylinderGeometry(0.07, 0.07, 0.7, 8),
+        new THREE.MeshStandardMaterial({
+          color: 0x58a6ff,
+          emissive: 0x1f6feb,
+          emissiveIntensity: 1.2
+        })
+      );
+      branch.position.set(0.55, 0.9, 0.55);
+      branch.rotation.z = Math.PI / 5;
+      group.add(branch);
+
+      const light = new THREE.PointLight(0x3fb950, 3, 7, 2);
+      group.add(light);
+
+      group.userData = {
+        title: 'GitHub picks',
+        url: 'box4.html',
+        type: 'github'
+      };
+      return group;
+    }
+
+    const items = [
+      { factory: createAI,     color: '#00e5ff' },
+      { factory: createDND,    color: '#ff6b8a' },
+      { factory: createGitHub, color: '#3fb950' }
+    ];
+
+    const orbiters = [];
+    items.forEach((item, i) => {
+      const obj = item.factory();
+      const angle = (i / 3) * Math.PI * 2;
+      obj.position.set(
+        Math.cos(angle) * orbitRadius,
+        orbitHeight,
+        Math.sin(angle) * orbitRadius
+      );
+      obj.userData.baseAngle = angle;
+      scene.add(obj);
+      interactive.push(obj);
+      orbiters.push(obj);
+
+      const div = document.createElement('div');
+      div.className = 'label';
+      div.textContent = obj.userData.title;
+      div.style.borderColor = item.color;
+      div.style.color = item.color;
+      const label = new CSS2DObject(div);
+      label.position.set(0, 1.45, 0);
+      obj.add(label);
+    });
+
+    // ——— Floating main title (fixed, does not orbit/rotate) ———
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'main-title';
+    titleDiv.textContent = 'Ideas is all you need';
+    const titleLabel = new CSS2DObject(titleDiv);
+    titleLabel.position.set(0, 8.2, 0);
+    scene.add(titleLabel);
+
+    // ——— Raycasting for clicks ———
+    const raycaster = new THREE.Raycaster();
+    const pointer = new THREE.Vector2();
+    let pointerDown = false;
+    let downPos = { x: 0, y: 0 };
+
+    function onPointerDown(e) {
+      pointerDown = true;
+      downPos.x = e.clientX;
+      downPos.y = e.clientY;
+    }
+
+    function onPointerUp(e) {
+      if (!pointerDown) return;
+      pointerDown = false;
+
+      const dx = e.clientX - downPos.x;
+      const dy = e.clientY - downPos.y;
+      if (Math.hypot(dx, dy) > 6) return;
+
+      pointer.x = (e.clientX / window.innerWidth) * 2 - 1;
+      pointer.y = -(e.clientY / window.innerHeight) * 2 + 1;
+
+      raycaster.setFromCamera(pointer, camera);
+      const hits = raycaster.intersectObjects(interactive, true);
+
+      if (hits.length > 0) {
+        let obj = hits[0].object;
+        while (obj && !obj.userData.url) obj = obj.parent;
+        if (obj && obj.userData.url) {
+          window.open(obj.userData.url, '_blank', 'noopener,noreferrer');
+        }
       }
     }
 
-    loadBox("box1", "box1.html");
-    loadBox("box2", "box2.html");
-    loadBox("box3", "box3.html");
-  </script>
+    renderer.domElement.addEventListener('pointerdown', onPointerDown);
+    renderer.domElement.addEventListener('pointerup', onPointerUp);
 
+    // ——— Keyboard movement ———
+    const keys = {};
+    const moveSpeed = 0.12;
+    window.addEventListener('keydown', e => {
+      keys[e.code] = true;
+      if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','KeyW','KeyA','KeyS','KeyD','KeyQ','KeyE','PageUp','PageDown'].includes(e.code)) {
+        e.preventDefault();
+      }
+    });
+    window.addEventListener('keyup', e => { keys[e.code] = false; });
+
+    function handleKeyboard() {
+      const dir = new THREE.Vector3();
+      const front = new THREE.Vector3();
+      const side = new THREE.Vector3();
+      camera.getWorldDirection(front);
+      front.y = 0;
+      front.normalize();
+      side.crossVectors(front, new THREE.Vector3(0, 1, 0)).normalize();
+
+      if (keys['KeyW'] || keys['ArrowUp'])    dir.add(front);
+      if (keys['KeyS'] || keys['ArrowDown'])  dir.sub(front);
+      if (keys['KeyA'] || keys['ArrowLeft'])  dir.sub(side);
+      if (keys['KeyD'] || keys['ArrowRight']) dir.add(side);
+      if (keys['KeyQ'] || keys['PageDown'])   dir.y -= 1;
+      if (keys['KeyE'] || keys['PageUp'])     dir.y += 1;
+
+      if (dir.lengthSq() > 0) {
+        dir.normalize().multiplyScalar(moveSpeed);
+        camera.position.add(dir);
+        controls.target.add(dir);
+      }
+    }
+
+    // ——— Resize ———
+    window.addEventListener('resize', () => {
+      camera.aspect = window.innerWidth / window.innerHeight;
+      camera.updateProjectionMatrix();
+      renderer.setSize(window.innerWidth, window.innerHeight);
+      labelRenderer.setSize(window.innerWidth, window.innerHeight);
+    });
+
+    // ——— Animation ———
+    const clock = new THREE.Clock();
+
+    function animate() {
+      requestAnimationFrame(animate);
+      const t = clock.getElapsedTime();
+
+      orbiters.forEach((obj, i) => {
+        const angle = obj.userData.baseAngle + t * orbitSpeed;
+        obj.position.x = Math.cos(angle) * orbitRadius;
+        obj.position.z = Math.sin(angle) * orbitRadius;
+        obj.position.y = orbitHeight + Math.sin(t * 1.1 + i) * 0.18;
+
+        obj.rotation.y += 0.006;
+
+        if (obj.userData.type === 'ai' && obj.userData.nodes) {
+          obj.userData.nodes.forEach((node, n) => {
+            const a = (n / 6) * Math.PI * 2 + t * 0.7;
+            node.position.x = Math.cos(a) * 1.15;
+            node.position.z = Math.sin(a) * 1.15;
+            node.position.y = Math.sin(a * 1.5 + t) * 0.35;
+          });
+        }
+      });
+
+      handleKeyboard();
+      controls.update();
+      renderer.render(scene, camera);
+      labelRenderer.render(scene, camera);
+    }
+
+    animate();
+  </script>
 </body>
 </html>
