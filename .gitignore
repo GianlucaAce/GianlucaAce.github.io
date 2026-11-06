@@ -17,5 +17,5 @@ __pycache__/
 *$py.class
 *.so
 .Python
-./etc
+./etc_local
 
