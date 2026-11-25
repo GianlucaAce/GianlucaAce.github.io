@@ -19,4 +19,7 @@ __pycache__/
 .Python
 ./etc_local
 etc_local/*
+./stage
+stage/*
+
 
